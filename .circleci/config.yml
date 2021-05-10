@@ -39,7 +39,7 @@ jobs:
           command: /usr/local/share/android-sdk/tools/emulator @Pixel_2_API_26 -noaudio -no-boot-anim -no-window
           background: true
       - run:
-          name: download Cordova 
+          name: download Cordova
           command: npm install -g cordova
       - run:
           name: Copy sampleApp
@@ -47,13 +47,22 @@ jobs:
       - run:
           name: chmod permissions
           command: cd ../; chmod -R 777 sampleApp
-      - run: 
+      - run:
           name: Npm Install
           command: cd ../sampleApp; npm install
-      - run: 
+      - run:
           name: Add Instabug
           command: cd ../sampleApp; cordova plugin add ../project
-      - run: 
+      - run:
+          name: Add Android Token
+          command: cd ../sampleApp/platforms/android/app/src/main/java/com/instabug/cordova/plugin; ex -s -c '%s/YOUR_ANDROID_TOKEN/$CORDOVA_E2E_APP_TOKEN/g|x' MyApplication.java
+      - run:
+          name: Install gnu-sed to edit initialization code
+          command: HOMEBREW_NO_AUTO_UPDATE=1 brew install gnu-sed
+      - run:
+          name: Import & disable Instabug Android welcome message
+          command: cd ../sampleApp/platforms/android/app/src/main/java/com/instabug/cordova/plugin; gsed -i '11 a import com.instabug.library.ui.onboarding.WelcomeMessage;' MyApplication.java; gsed -i '27 a Instabug.setWelcomeMessageState(WelcomeMessage.State.DISABLED);' MyApplication.java
+      - run:
           name: Build App
           command: cd ../sampleApp; cordova build android
       - run:
@@ -83,7 +92,7 @@ jobs:
       - checkout:
           path: ~/project
       - run:
-          name: download Cordova 
+          name: download Cordova
           command: npm install -g cordova
       - run:
           name: Copy sampleApp
@@ -91,13 +100,13 @@ jobs:
       - run:
           name: chmod permissions
           command: cd ../; chmod -R 777 sampleApp
-      - run: 
+      - run:
           name: Npm Install
           command: cd ../sampleApp; npm install
-      - run: 
+      - run:
           name: Add Instabug
           command: cd ../sampleApp; cordova plugin add ../project
-      - run: 
+      - run:
           name: Build App
           command: cd ../sampleApp; cordova build ios
       - run:
@@ -134,4 +143,3 @@ workflows:
           filters:
             branches:
               only: master
-
